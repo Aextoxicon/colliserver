@@ -12,16 +12,15 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v4"
 	"golang.org/x/crypto/bcrypt"
-	"gorm.io/driver/postgres"
+	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
 
 var (
-	db          *gorm.DB
-	jwtKey      = []byte(os.Getenv("JWT_SECRET"))
-	uploadDir   = os.Getenv("UPLOAD_DIR")
-	apiToken    = os.Getenv("API_TOKEN")
-	dbUrl       = os.Getenv("COMMENTS_DATABASE_URL")
+	db       *gorm.DB
+	jwtKey   = []byte(os.Getenv("JWT_SECRET"))
+	apiToken = os.Getenv("API_TOKEN")
+	dbPath   = os.Getenv("DB_PATH")
 )
 
 type User struct {
@@ -51,8 +50,11 @@ type Claims struct {
 
 func init() {
 	var err error
-	dsn := dbUrl
-	db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	path := dbPath
+	if path == "" {
+		path = "database.db" // 默认 SQLite 数据库文件
+	}
+	db, err = gorm.Open(sqlite.Open(path), &gorm.Config{})
 	if err != nil {
 		log.Fatal("Failed to connect to database:", err)
 	}
@@ -65,14 +67,8 @@ func main() {
 	if _, ok := os.LookupEnv("JWT_SECRET"); !ok {
 		log.Fatal("Missing env: JWT_SECRET")
 	}
-	if _, ok := os.LookupEnv("UPLOAD_DIR"); !ok {
-		log.Fatal("Missing env: UPLOAD_DIR")
-	}
-	if _, ok := os.LookupEnv("API_TOKEN"); !ok {
-		log.Fatal("Missing env: API_TOKEN")
-	}
-	if _, ok := os.LookupEnv("COMMENTS_DATABASE_URL"); !ok {
-		log.Fatal("Missing env: COMMENTS_DATABASE_URL")
+	if _, ok := os.LookupEnv("DB_PATH"); !ok {
+		log.Println("Warning: DB_PATH not set, using default: database.db")
 	}
 
 	r := gin.Default()
@@ -83,12 +79,6 @@ func main() {
 	config.AllowCredentials = true
 	config.AllowHeaders = []string{"Origin", "Content-Length", "Content-Type", "Authorization"}
 	r.Use(cors.New(config))
-
-	// 设置上传目录
-	if uploadDir == "" {
-		uploadDir = "./uploads"
-	}
-	os.MkdirAll(uploadDir, 0755)
 
 	// 用户认证相关路由
 	r.POST("/api/register", register)

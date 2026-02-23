@@ -1,6 +1,6 @@
 # Colliserver - Golang 版本
 
-这是原始 Node.js 项目的 Golang 版本，使用 Gin 框架和 GORM 实现。
+这是原始 Node.js 项目的 Golang 版本，使用 Gin 框架和 GORM 实现，现改为使用 SQLite 数据库。
 
 ## 功能
 
@@ -12,7 +12,7 @@
 ## 依赖
 
 - Go 1.21+
-- PostgreSQL 数据库
+- SQLite 数据库
 - Gin 框架
 - GORM
 - JWT 认证
@@ -22,9 +22,8 @@
 需要设置以下环境变量：
 
 ```bash
-COMMENTS_DATABASE_URL=postgres://username:password@localhost:5432/database_name
 JWT_SECRET=your_jwt_secret_key
-API_TOKEN=your_api_token
+DB_PATH=database.db  # SQLite 数据库文件路径，默认为 database.db
 ```
 
 ## 安装和运行
@@ -38,9 +37,8 @@ go mod tidy
 
 3. 设置环境变量：
 ```bash
-export COMMENTS_DATABASE_URL="postgres://username:password@localhost:5432/dbname"
 export JWT_SECRET="your-secret-key-here"
-export API_TOKEN="your-api-token"
+export DB_PATH="database.db"  # 可选，默认为当前目录下的 database.db
 ```
 
 4. 运行应用：
@@ -52,7 +50,6 @@ go run main.go
 ```bash
 go build -o colliserver .
 ./colliserver
-```
 
 ## API 端点
 
@@ -73,6 +70,5 @@ go build -o colliserver .
 
 ## 注意事项
 
-- 确保 PostgreSQL 服务器正在运行
 - 确保环境变量正确设置
-- 上传目录需要具有适当的写权限
+- SQLite 数据库文件会自动创建

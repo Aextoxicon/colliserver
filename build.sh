@@ -19,10 +19,8 @@ go build -o colliserver .
 if [ $? -eq 0 ]; then
     echo "构建成功！"
     echo "运行方法："
-    echo "  export COMMENTS_DATABASE_URL='postgres://username:password@localhost:5432/dbname'"
     echo "  export JWT_SECRET='your-secret-key'"
-    echo "  export UPLOAD_DIR='./uploads'"
-    echo "  export API_TOKEN='your-api-token'"
+    echo "  export DB_PATH='database.db'  # 可选，默认为当前目录下的 database.db"
     echo "  ./colliserver"
 else
     echo "构建失败"
