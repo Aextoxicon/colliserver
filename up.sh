@@ -1,1 +1,1 @@
-git pull origin master && npm i && node main.js
+git pull origin master && ./serverApp
